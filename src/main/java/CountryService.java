@@ -8,12 +8,14 @@ import java.util.List;
 
 public class CountryService {
 
-    @Qualifier("countryReader")
     private static List<Country> countries;
 
-    public static void main(String[] args) throws IOException {
-        CountryService countryService = new CountryService();
-        System.out.println(getCountriesWithXButNoY("COD", "ZMB"));
+    static {
+        try {
+            countries = FirstSpringApplication.countryReader();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public CountryService() throws IOException {
@@ -32,7 +34,7 @@ public class CountryService {
     }
 
     private static List<Country> getCountry(String country) {
-        List <Country> result = countries.stream()
+        List<Country> result = countries.stream()
                 .filter(country1 -> country.equals(country1.getName()))
                 .toList();
         return result;
@@ -48,7 +50,7 @@ public class CountryService {
 
     public static List<Country> getCountriesInContinent(String continent) {
         return countries.stream()
-                .filter(country ->continent.equals(country.getContinent()) )
+                .filter(country -> continent.equals(country.getContinent()))
                 .toList();
     }
 
@@ -61,9 +63,11 @@ public class CountryService {
                 .filter(country -> country.getContinent().equals(continent) && country.getPopulation() > population)
                 .toList();
     }
-    public static List<Country>getCountriesWithXButNoY(String x, String y){
+
+    public static List<Country> getCountriesWithXButNoY(String x, String y) {
         return countries.stream()
-                .filter(country -> country.getNeighbours().contains(x) && !country.getNeighbours().contains(y))
+                .filter(country -> (country.getNeighbours() != null) && country.getNeighbours().contains(x)
+                        && !country.getNeighbours().contains(y))
                 .toList();
     }
 
